@@ -1,5 +1,6 @@
 package com.masdam.wanderapps;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
 
 import android.os.Bundle;
@@ -8,10 +9,15 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PointOfInterest;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+import java.util.Locale;
+
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
 
@@ -40,8 +46,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        LatLng jogja = new LatLng(-7.797, 110.370);
+        mMap.addMarker(new MarkerOptions().position(jogja).title("Marker in Yogyakarta Sleman Uhuyyy").snippet("Anda di sini"));
+        float zoom=13;
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(jogja, zoom));
+        setMapLongClick(mMap);
+        setPoiClick(mMap);
+    }
+
+    private void setMapLongClick(final GoogleMap map){
+        map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+                String snippet = String.format(Locale.getDefault(),"Lat= %1$.5f, Long: %2$.5f",latLng.latitude,latLng.longitude);
+                map.addMarker(new MarkerOptions().position(latLng).title("Dropped Pin").snippet(snippet).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+            }
+        });
+    }
+
+    private void setPoiClick(final GoogleMap map){
+        map.setOnPoiClickListener(new GoogleMap.OnPoiClickListener() {
+            @Override
+            public void onPoiClick(PointOfInterest pointOfInterest) {
+                Marker poiMarker = map.addMarker(new MarkerOptions().position(pointOfInterest.latLng).title(pointOfInterest.name));
+                poiMarker.showInfoWindow();
+            }
+        });
     }
 }
